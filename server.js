@@ -1,0 +1,34 @@
+const express = require("express")
+const dotenv = require("dotenv")
+const colors = require("colors")
+//route files
+const bootcamps = require("./routes/bootcamps")
+// middleware import
+const morgan = require("morgan")
+// db connection import
+const connectDB = require("./config/db")
+
+dotenv.config({ path: "./config/config.env" })
+connectDB()
+const app = express()
+
+//body parser 
+//middleware for handling post req
+app.use(express.json())
+
+//used morgan middleware for logging
+if (process.env.NODE_ENV === "development") {
+    app.use(morgan('dev'))
+}
+
+// mounting routes 
+// app.use("/", (req, res) => {
+//     return res.status(200).json("server running")
+// })
+app.use("/api/v1/bootcamps", bootcamps)
+
+const PORT = process.env.PORT || 2001
+
+app.listen(PORT, () => {
+    console.log(`server is running in ${process.env.NODE_ENV} in ${PORT}`.yellow)
+})
