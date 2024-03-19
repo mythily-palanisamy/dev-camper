@@ -1,6 +1,7 @@
 const express = require("express")
 const dotenv = require("dotenv")
 const colors = require("colors")
+const errorHandler = require("./middleware/error")
 //route files
 const bootcamps = require("./routes/bootcamps")
 // middleware import
@@ -21,11 +22,11 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan('dev'))
 }
 
-// mounting routes 
-// app.use("/", (req, res) => {
-//     return res.status(200).json("server running")
-// })
+
 app.use("/api/v1/bootcamps", bootcamps)
+
+// its a middleware to catch and handle any errors that occur during the processing of requests.
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 2001
 
