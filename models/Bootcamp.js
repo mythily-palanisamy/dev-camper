@@ -1,5 +1,7 @@
 const mongoose = require("mongoose")
 const slugify = require("slugify")
+const geocoder = require("../utils/geocoder")
+
 
 const BootcampSchema = new mongoose.Schema({
     name: {
@@ -97,10 +99,37 @@ const BootcampSchema = new mongoose.Schema({
 
 // create bootcamp slug from name
 // when u save in db, and then u want to edit it into a url-friendly is called as slugify
+
+//pre: it is a middleware that runs before the documents is saved
+//next: it is a function that runs after the middleware is done
+
 BootcampSchema.pre("save", function (next) {
-    // console.log("slugify ran", this.name)
+    // console.log("in slugify")
     this.slug = slugify(this.name, { lower: true })
     next()
 })
 
+//geocode and create location field
+BootcampSchema.pre("save", async function (next) {
+    // console.log("in location save")
+    const loc = await geocoder.geocode(this.address)
+    //why we use geocoder ,why we need to convert the address into the coordinates- because we need to show the location of the bootcamp on the map
+
+    this.location = {
+        type: "Point",
+        //longitude - xaxis, latitude - yaxis of the map
+        coordinates: [loc[0].longitude, loc[0].latitude],
+        formattedAddress: loc[0].formattedAddress,
+        street: loc[0].streetName,
+        city: loc[0].city,
+        state: loc[0].stateCode,
+        zipcode: loc[0].zipcode,
+        country: loc[0].countryCode
+    }
+    next();
+    this.address = undefined //we dont need address because we have formattedAddress instead
+})
 module.exports = mongoose.model("Bootcamp", BootcampSchema)
+
+//i am getting an error ;     "error": "Status is REQUEST_DENIED. You must use an API key to authenticate each request to Google Maps Platform APIs. For additional information, please refer to http://g.co/dev/maps-no-account"
+//i have added the api key in the .env file but still i am getting this error-

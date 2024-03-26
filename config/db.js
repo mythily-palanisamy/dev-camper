@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 //connecting to mongodb using mongoose library
 let connectDB = async () => {
-    // let connect = await mongoose.connect(process.env.MONGO_URI)
+
     // console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
     try {
         let connect = await mongoose.connect(process.env.MONGO_URI);
