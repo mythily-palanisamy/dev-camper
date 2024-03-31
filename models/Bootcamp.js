@@ -95,7 +95,13 @@ const BootcampSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
+
+)
 
 // create bootcamp slug from name
 // when u save in db, and then u want to edit it into a url-friendly is called as slugify
@@ -129,7 +135,23 @@ BootcampSchema.pre("save", async function (next) {
     next();
     this.address = undefined //we dont need address because we have formattedAddress instead
 })
+
+// Cascade delete courses when a bootcamp is deleted
+BootcampSchema.pre('remove', async function (next) {
+    console.log(`Courses being removed from bootcamp ${this._id}`);
+    await this.model('Course').deleteMany({ bootcamp: this._id });
+    console.log(`Reviews being removed from bootcamp ${this._id}`);
+    await this.model('Review').deleteMany({ bootcamp: this._id });
+    next();
+});
+
+// Reverse populate with virtuals
+BootcampSchema.virtual('courses', {
+    ref: 'Course',
+    localField: '_id',
+    foreignField: 'bootcamp',
+    justOne: false
+});
+
 module.exports = mongoose.model("Bootcamp", BootcampSchema)
 
-//i am getting an error ;     "error": "Status is REQUEST_DENIED. You must use an API key to authenticate each request to Google Maps Platform APIs. For additional information, please refer to http://g.co/dev/maps-no-account"
-//i have added the api key in the .env file but still i am getting this error-

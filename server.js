@@ -4,6 +4,8 @@ const colors = require("colors")
 const errorHandler = require("./middleware/error")
 //route files
 const bootcamps = require("./routes/bootcamps")
+const courses = require("./routes/courses")
+const auth = require("./routes/auth")
 // middleware import
 const morgan = require("morgan")
 // db connection import
@@ -24,6 +26,8 @@ if (process.env.NODE_ENV === "development") {
 
 
 app.use("/api/v1/bootcamps", bootcamps)
+app.use("/api/v1/courses", courses)
+app.use("/api/v1/auth", auth)
 
 // its a middleware to catch and handle any errors that occur during the processing of requests.
 app.use(errorHandler)
