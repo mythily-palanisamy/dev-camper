@@ -2,6 +2,7 @@ const express = require("express")
 const dotenv = require("dotenv")
 const colors = require("colors")
 const errorHandler = require("./middleware/error")
+const cookieParser = require("cookie-parser")
 //route files
 const bootcamps = require("./routes/bootcamps")
 const courses = require("./routes/courses")
@@ -19,11 +20,13 @@ const app = express()
 //middleware for handling post req
 app.use(express.json())
 
+//cookie parser
+app.use(cookieParser())
+
 //used morgan middleware for logging
 if (process.env.NODE_ENV === "development") {
     app.use(morgan('dev'))
 }
-
 
 app.use("/api/v1/bootcamps", bootcamps)
 app.use("/api/v1/courses", courses)
